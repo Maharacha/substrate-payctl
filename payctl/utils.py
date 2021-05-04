@@ -5,10 +5,10 @@ from substrateinterface.utils.ss58 import ss58_encode, ss58_decode
 # get_config - Get a default and validator specific config elements from args and config.
 #
 def get_config(args, config, key, section='Defaults'):
-    if vars(args)[key] is not None:
+    if vars(args)[key]:
         return vars(args)[key]
 
-    if config[section].get(key) is not None:
+    if config[section].get(key):
         return config[section].get(key)
 
     return config['Defaults'].get(key)
@@ -128,10 +128,9 @@ def get_included_accounts(substrate, args, config):
         for validator in args.validators:
             included_accounts.append('0x' + ss58_decode(validator, valid_ss58_format=substrate.ss58_format))
     else:
-        for section in config.sections():
-            if section == 'Defaults':
-                continue
-            included_accounts.append('0x' + ss58_decode(section, valid_ss58_format=substrate.ss58_format))
+        accounts = get_config(args, config, 'validators', section='Defaults').split(',')
+        for account in accounts:
+            included_accounts.append('0x' + ss58_decode(account, valid_ss58_format=substrate.ss58_format))
 
     return(included_accounts)
 

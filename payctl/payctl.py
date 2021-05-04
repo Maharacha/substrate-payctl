@@ -2,6 +2,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from configparser import ConfigParser
 
 from .utils import *
+from .twitter import Twitter
 
 
 #
@@ -33,22 +34,22 @@ def cmd_list(args, config):
     start = current_era - depth
     end = current_era
 
-    eras_paymemt_info = get_eras_payment_info_filtered(
+    eras_payment_info = get_eras_payment_info_filtered(
         substrate, start, end,
         accounts=get_included_accounts(substrate, args, config),
         unclaimed=args.unclaimed
     )
 
-    for era in eras_paymemt_info:
+    for era in eras_payment_info:
         print("Era: %s" % era)
-        for accountId in eras_paymemt_info[era]:
-            if eras_paymemt_info[era][accountId]['claimed'] is True:
+        for accountId in eras_payment_info[era]:
+            if eras_payment_info[era][accountId]['claimed'] is True:
                 msg = "claimed"
             else:
                 msg = "unclaimed"
 
             account = ss58_encode(accountId, ss58_format=substrate.ss58_format)
-            amount = eras_paymemt_info[era][accountId]['amount']
+            amount = eras_payment_info[era][accountId]['amount']
 
             print("\t %s => %s %s  (%s)" % (account, amount, substrate.token_symbol, msg))
 
@@ -78,20 +79,20 @@ def cmd_pay(args, config):
         depth = 82
     #depth = min(history_depth.value, int(config['Defaults'].get('eradepth')))
 
-    eras_paymemt_info = get_eras_payment_info_filtered(
+    eras_payment_info = get_eras_payment_info_filtered(
         substrate, current_era - depth, current_era,
         accounts=get_included_accounts(substrate, args, config),
         unclaimed=True
     )
 
-    if len(eras_paymemt_info) < int(get_config(args, config, 'mineras')):
+    if len(eras_payment_info) < int(get_config(args, config, 'mineras')):
         return
 
     keypair = get_keypair(args, config)
 
     payout_calls = []
-    for era in eras_paymemt_info:
-        for accountId in eras_paymemt_info[era]:
+    for era in eras_payment_info:
+        for accountId in eras_payment_info[era]:
             payout_calls.append({
                 'call_module': 'Staking',
                 'call_function': 'payout_stakers',
@@ -131,6 +132,8 @@ def cmd_pay(args, config):
 
     print(result)
 
+    tweet_text = Twitter.generate_tweet_text(eras_payment_info)
+    Twitter(config).update_status(tweet_text)
 
 
 def main():
