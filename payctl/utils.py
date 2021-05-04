@@ -7,7 +7,7 @@ def get_config(args, config, key, section='Defaults'):
     if vars(args).get(key) is not None:
         return vars(args)[key]
 
-    if config[section].get(key) is not None:
+    if config[section].get(key):
         return config[section].get(key)
 
     return config['Defaults'].get(key)
@@ -129,9 +129,9 @@ def get_eras_payment_info_filtered(substrate, start, end, accounts=[], only_uncl
 def get_included_accounts(args, config):
     if len(args.validators) != 0:
         return [validator for validator in args.validators]
-
-    return [section for section in config.sections() if section != "Defaults"]
-
+    else:
+        accounts = get_config(args, config, 'validators', section='Defaults').split(',')
+        return accounts
 
 
 #

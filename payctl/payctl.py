@@ -4,6 +4,7 @@ from collections import OrderedDict
 from substrateinterface import SubstrateInterface
 
 from .utils import *
+from .twitter import Twitter
 
 
 #
@@ -141,8 +142,10 @@ def cmd_pay(args, config):
         wait_for_inclusion=True
     )
 
-    fees = extrinsic_receipt.total_fee_amount
+    tweet_text = Twitter.generate_tweet_text(eras_payment_info)
+    Twitter(config).update_status(tweet_text)
 
+    fees = extrinsic_receipt.total_fee_amount
     print(f"\t Extrinsic hash: {extrinsic_receipt.extrinsic_hash}")
     print(f"\t Block hash: {extrinsic_receipt.block_hash}")
     print(f"\t Fee: {format_balance_to_symbol(substrate, fees)} ({fees})")
