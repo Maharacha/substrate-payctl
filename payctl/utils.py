@@ -193,3 +193,16 @@ def get_nonce(substrate, account):
     )
 
     return account_info.value['nonce']
+
+
+#
+# Check if there exist an unclaimed reward that is older then MaxAgeUnclaimed.
+#
+def old_unclaimed_exist(eras_payment_info, max_age_unclaimed, current_era):
+    era_threshold = current_era - max_age_unclaimed
+    for era in eras_payment_info:
+        for accountId in eras_payment_info[era]:
+            if eras_payment_info[era][accountId]['claimed'] is False:
+                if era < era_threshold:
+                    print('payout triggered by era ', era)
+                    return True

@@ -86,7 +86,11 @@ def cmd_pay(args, config):
     )
 
     if len(eras_payment_info) < int(get_config(args, config, 'mineras')):
-        return
+        max_age_unclaimed = int(get_config(args, config, 'maxageunclaimed'))
+        if max_age_unclaimed is None:
+            max_age_unclaimed = 82
+        if not old_unclaimed_exist(eras_payment_info, max_age_unclaimed, current_era):
+            return
 
     keypair = get_keypair(args, config)
 
@@ -153,6 +157,7 @@ def main():
     args_subparser_pay = args_subparsers.add_parser('pay', help="pay rewards")
     args_subparser_pay.add_argument("validators", nargs='*', help="", default=None)
     args_subparser_pay.add_argument("-m", "--min-eras", dest="mineras", help="minum eras pending to pay to proceed payment")
+    args_subparser_pay.add_argument("--max-age", dest="maxageunclaimed", help="Maximum allowed age for any unclaimed era before overriding min-eras")
     args_subparser_pay.add_argument("-a", "--signing-account", dest="signingaccount", help="account used to sign requests")
     args_subparser_pay.add_argument("-n", "--signing-mnemonic", dest="signingmnemonic", help="mnemonic to generate the signing key")
     args_subparser_pay.add_argument("-s", "--signing-seed", dest="signingseed", help="seed to generate the signing key")
