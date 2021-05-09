@@ -79,12 +79,16 @@ def cmd_pay(args, config):
         print(f"There are no rewards to claim in the last {depth} era(s)")
         return
 
-    if len(eras_payment_info.keys()) < minEras:
-        print(
-            f"There are rewards to claim on {len(eras_payment_info.keys())} era(s), " + 
-            f"but those are not enough to reach the minimum threshold ({minEras})"
-        )
-        return
+    if len(eras_payment_info) < int(get_config(args, config, 'mineras')):
+        max_age_unclaimed = int(get_config(args, config, 'maxageunclaimed'))
+        if max_age_unclaimed is None:
+            max_age_unclaimed = 84
+        if not old_unclaimed_exist(eras_payment_info, max_age_unclaimed, active_era):
+            print(
+                f"There are rewards to claim on {len(eras_payment_info.keys())} era(s), " + 
+                f"but those are not enough to reach the minimum threshold ({minEras})"
+            )
+            return
 
     keypair = get_keypair(args, config)
 
@@ -170,6 +174,7 @@ def main():
     args_subparser_pay = args_subparsers.add_parser('pay', help="pay rewards")
     args_subparser_pay.add_argument("validators", nargs='*', help="", default=None)
     args_subparser_pay.add_argument("-m", "--min-eras", dest="mineras", help="minum eras pending to pay to proceed payment")
+    args_subparser_pay.add_argument("--max-age", dest="maxageunclaimed", help="Maximum allowed age for any unclaimed era before overriding min-eras")
     args_subparser_pay.add_argument("-a", "--signing-account", dest="signingaccount", help="account used to sign requests")
     args_subparser_pay.add_argument("-n", "--signing-mnemonic", dest="signingmnemonic", help="mnemonic to generate the signing key")
     args_subparser_pay.add_argument("-s", "--signing-seed", dest="signingseed", help="seed to generate the signing key")
