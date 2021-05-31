@@ -4,7 +4,7 @@ from substrateinterface import Keypair
 # get_config - Get a default and validator specific config elements from args and config.
 #
 def get_config(args, config, key, section='Defaults'):
-    if vars(args).get(key) is not None:
+    if vars(args).get(key):
         return vars(args)[key]
 
     if config[section].get(key):
