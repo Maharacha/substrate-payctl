@@ -37,4 +37,5 @@ class Twitter():
         total_reward = round(total_reward, 4)
         tweet_text = 'Payout has been made for eras: ' + ', '.join([str(era) for era in eras_payment_info])
         tweet_text = tweet_text + '\nA total of {} {}\nCongratulation all stakers!'.format(total_reward, currency)
+        tweet_text = tweet_text + '\n#polkadot #kusama #web3 #cryptocurrency'
         return tweet_text
