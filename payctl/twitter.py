@@ -17,7 +17,7 @@ class Twitter():
         api = tweepy.API(self.auth)
         try:
             api.update_status(status=text) 
-        except tweepy.error.TweepError as e:
+        except Exception as e:
             print('Update twitter status failed: ' + str(e))
 
     @staticmethod
