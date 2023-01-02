@@ -133,7 +133,7 @@ def cmd_pay(args, config):
         call=call,
         keypair=keypair,
         nonce=account_info['nonce'],
-        signature=signature.hex()
+        signature=signature
     )
 
     print(
